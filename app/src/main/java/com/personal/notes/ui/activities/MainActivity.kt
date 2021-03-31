@@ -8,7 +8,6 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.personal.notes.R
 import com.personal.notes.data.Note
@@ -16,11 +15,12 @@ import com.personal.notes.ui.adapters.NotesAdapter
 import com.personal.notes.viewmodels.NotesViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.dialog_ui.view.*
+import org.koin.android.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var context: Context
-    private var notesVieModel: NotesViewModel? = null
+    private val notesVieModel: NotesViewModel by viewModel()
     private val notesAdapter: NotesAdapter by lazy {
         NotesAdapter()
     }
@@ -34,11 +34,8 @@ class MainActivity : AppCompatActivity() {
         recycler_view.adapter = notesAdapter
         recycler_view.layoutManager = LinearLayoutManager(context)
 
-        //Initialize view model
-        notesVieModel = ViewModelProvider(this).get(NotesViewModel::class.java)
-
         //Observe view model changes
-        notesVieModel?.getNotes()?.observe(this, { data ->
+        notesVieModel.getNotes()?.observe(this, { data ->
             data?.let {
                 if (data.isEmpty()) {
                     Toast.makeText(context, R.string.empty_list, Toast.LENGTH_LONG).show()
@@ -70,7 +67,7 @@ class MainActivity : AppCompatActivity() {
                 .setPositiveButton(R.string.save) { _, _ ->
                     //Save a note
                     val note = Note(0, inputNote.text.toString())
-                    notesVieModel?.save(note)
+                    notesVieModel.save(note)
                 }
                 .create()
                 .show()
